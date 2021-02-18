@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "stm32f1xx.h": "c",
+        "motor.c": "cpp",
+        "led.c": "cpp",
+        "tim.c": "cpp"
+    }
+}
