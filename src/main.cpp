@@ -4,8 +4,10 @@
 #include "motor.h"
 #include "led.h"
 #include "delay.h"
+#include "usart.h"
 
-void trapesoidal();
+void trapesoidal(void);
+void spinMotor(void);
 
 // A+ B- C0
 // A+ B0 C-
@@ -15,8 +17,7 @@ void trapesoidal();
 // A0 B- C+
 
 uint16_t sinTable[120] = {
-    0, 0, 1, 3, 6, 9, 13, 17, 22, 28, 34, 41, 49, 57, 66, 75, 85, 95, 106, 117, 128, 140, 152, 164, 177, 190, 203, 216, 229, 243, 256, 269, 283, 296, 309, 322, 335, 348, 360, 372, 384, 395, 406, 417, 427, 437, 446, 455, 463, 471, 478, 484, 490, 495, 499, 503, 506, 509, 511, 512, 512, 512, 511, 509, 506, 503, 499, 495, 490, 484, 478, 471, 463, 455, 446, 437, 427, 417, 406, 395, 384, 372, 360, 348, 335, 322, 309, 296, 283, 269, 256, 243, 229, 216, 203, 190, 177, 164, 152, 140, 128, 117, 106, 95, 85, 75, 66, 57, 49, 41, 34, 28, 22, 17, 13, 9, 6, 3, 1, 0
-};
+    0, 0, 1, 3, 6, 9, 13, 17, 22, 28, 34, 41, 49, 57, 66, 75, 85, 95, 106, 117, 128, 140, 152, 164, 177, 190, 203, 216, 229, 243, 256, 269, 283, 296, 309, 322, 335, 348, 360, 372, 384, 395, 406, 417, 427, 437, 446, 455, 463, 471, 478, 484, 490, 495, 499, 503, 506, 509, 511, 512, 512, 512, 511, 509, 506, 503, 499, 495, 490, 484, 478, 471, 463, 455, 446, 437, 427, 417, 406, 395, 384, 372, 360, 348, 335, 322, 309, 296, 283, 269, 256, 243, 229, 216, 203, 190, 177, 164, 152, 140, 128, 117, 106, 95, 85, 75, 66, 57, 49, 41, 34, 28, 22, 17, 13, 9, 6, 3, 1, 0};
 
 uint8_t pwmSin[48] = {
     127, 110, 94, 78, 64, 50, 37, 26, 17, 10,
@@ -32,8 +33,9 @@ uint8_t pos;
 
 void setup()
 {
-    ledRegister();
-    rollMotorPinsRegister();
+    init_usart(9600);
+    // ledRegister();
+    // rollMotorPinsRegister();
 }
 
 int speed = 10000;
@@ -44,46 +46,55 @@ int main(void)
 {
     setup();
 
-    while (1)
+    while (0)
     {
-        ledBluePWM(sinTable[currentStepA]);
-
-        rollMotorAPWM(sinTable[currentStepA]);
-        rollMotorBPWM(sinTable[currentStepB]);
-        rollMotorCPWM(sinTable[currentStepC]);
-
-        currentStepA++;
-        currentStepB++;
-        currentStepC++;
-
-        if (currentStepA == 119)
-            currentStepA = 0;
-        if (currentStepB == 119)
-            currentStepB = 0;
-        if (currentStepC == 119)
-            currentStepC = 0;
-
-        delayMc(speed);
-
-        if (currentStepA == 0){
-            loopCount++;
-        }
-
-        if (loopCount == round)
-        {
-            speed /= 2;
-            round *= 2;
-            loopCount = 0;
-        }
-
-        if (speed < 100)
-        {
-            speed = 10000;
-            round = 1;
-        }
+        spinMotor();
     }
 
+    while (1)
+    {}
+
     return 0;
+}
+
+void spinMotor(void)
+{
+    ledBluePWM(sinTable[currentStepA]);
+
+    rollMotorAPWM(sinTable[currentStepA]);
+    rollMotorBPWM(sinTable[currentStepB]);
+    rollMotorCPWM(sinTable[currentStepC]);
+
+    currentStepA++;
+    currentStepB++;
+    currentStepC++;
+
+    if (currentStepA == 119)
+        currentStepA = 0;
+    if (currentStepB == 119)
+        currentStepB = 0;
+    if (currentStepC == 119)
+        currentStepC = 0;
+
+    delayMc(speed);
+
+    if (currentStepA == 0)
+    {
+        loopCount++;
+    }
+
+    if (loopCount == round)
+    {
+        speed /= 2;
+        round *= 2;
+        loopCount = 0;
+    }
+
+    if (speed < 100)
+    {
+        speed = 10000;
+        round = 1;
+    }
 }
 
 void trapesoidal()
