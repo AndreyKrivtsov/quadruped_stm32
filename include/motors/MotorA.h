@@ -1,5 +1,9 @@
-#ifndef MOTOR_H
-#define MOTOR_H
+#ifndef MOTOR_A_H
+#define MOTOR_A_H
+
+#include "stm32f1xx.h"
+#include "tim.h"
+#include "gpio.h"
 
 void rollMotorPinsRegister();
 

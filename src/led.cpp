@@ -1,75 +1,75 @@
 #include "stm32f1xx.h"
 
 // create simple define abstractions for heartbeat LED
-#define LED_PORT GPIOA
-#define LED_CR CRL
-#define LED_SET GPIO_BSRR_BS3
-#define LED_RESET GPIO_BSRR_BR3
-#define LED_PORT_RESET_BITS GPIO_CRL_MODE3 | GPIO_CRL_CNF3
-#define LED_PORT_SET_BITS GPIO_CRL_MODE3_1 | GPIO_CRL_MODE3_0
-#define LED_CLOCK RCC_APB2ENR_IOPBEN
+// #define LED_PORT GPIOA
+// #define LED_CR CRL
+// #define LED_SET GPIO_BSRR_BS3
+// #define LED_RESET GPIO_BSRR_BR3
+// #define LED_PORT_RESET_BITS GPIO_CRL_MODE3 | GPIO_CRL_CNF3
+// #define LED_PORT_SET_BITS GPIO_CRL_MODE3_1 | GPIO_CRL_MODE3_0
+// #define LED_CLOCK RCC_APB2ENR_IOPBEN
 
-#define LED_DELAY_MS        150
+// #define LED_DELAY_MS        150
 
-// heartbeat LED global vars
-typedef enum
-{
-    led_idle = 0, led_on, led_off
-} led_state_t;
+// // heartbeat LED global vars
+// typedef enum
+// {
+//     led_idle = 0, led_on, led_off
+// } led_state_t;
 
-volatile led_state_t    led_state       = led_idle;
-volatile led_state_t    led_state_next  = led_on;
-volatile uint16_t       led_delay_count = 0;
+// volatile led_state_t    led_state       = led_idle;
+// volatile led_state_t    led_state_next  = led_on;
+// volatile uint16_t       led_delay_count = 0;
 
-void init_led()
-{
-    RCC->APB2ENR |= LED_CLOCK;                  // enable GPIO clock for LED
-    LED_PORT->LED_CR &= ~(LED_PORT_RESET_BITS); // reset pin MODE / CNF
-    LED_PORT->LED_CR |= (LED_PORT_SET_BITS);    // MODE: 50Mhz ouput CNF: PP
-}
+// void init_led()
+// {
+//     RCC->APB2ENR |= LED_CLOCK;                  // enable GPIO clock for LED
+//     LED_PORT->LED_CR &= ~(LED_PORT_RESET_BITS); // reset pin MODE / CNF
+//     LED_PORT->LED_CR |= (LED_PORT_SET_BITS);    // MODE: 50Mhz ouput CNF: PP
+// }
 
-void SysTick_Handler1(void)
-{
-    // update heartbeat LED delay counter and toggle state when needed
-    led_delay_count = ( (led_delay_count + 1) % LED_DELAY_MS );
-    if(led_delay_count == 0)
-    {
-        led_state       = led_state_next;
-        led_state_next  = led_idle;
-    }
-}
+// void SysTick_Handler1(void)
+// {
+//     // update heartbeat LED delay counter and toggle state when needed
+//     led_delay_count = ( (led_delay_count + 1) % LED_DELAY_MS );
+//     if(led_delay_count == 0)
+//     {
+//         led_state       = led_state_next;
+//         led_state_next  = led_idle;
+//     }
+// }
 
-void init_systick1(void)
-{
-    int tick_time = SystemCoreClock/1000;       // Generate interrupt each 1 ms
-    SysTick_Config(tick_time);                  // Configure systick timer
-}
+// void init_systick1(void)
+// {
+//     int tick_time = SystemCoreClock/1000;       // Generate interrupt each 1 ms
+//     SysTick_Config(tick_time);                  // Configure systick timer
+// }
 
-void led_heartbeat(void)
-{
-    switch(led_state)
-    {
-        case led_on:
-            led_state       = led_idle;
-            led_state_next  = led_off;
-            LED_PORT->BSRR  = LED_SET;
-            break;
+// void led_heartbeat(void)
+// {
+//     switch(led_state)
+//     {
+//         case led_on:
+//             led_state       = led_idle;
+//             led_state_next  = led_off;
+//             LED_PORT->BSRR  = LED_SET;
+//             break;
             
-        case led_off:
-            led_state       = led_idle;
-            led_state_next  = led_on;
-            LED_PORT->BSRR  = LED_RESET;
-            break;
+//         case led_off:
+//             led_state       = led_idle;
+//             led_state_next  = led_on;
+//             LED_PORT->BSRR  = LED_RESET;
+//             break;
             
-        default:
-            break;
-    }
-}
+//         default:
+//             break;
+//     }
+// }
 
 
 //******************* MY ***************************//
 
-void ledRegister(void)
+void init_led(void)
 {
     RCC->APB2ENR |= RCC_APB2ENR_IOPAEN; // GPIO PA Enable
     RCC->APB2ENR |= RCC_APB2ENR_IOPBEN; // GPIO PB Enable
