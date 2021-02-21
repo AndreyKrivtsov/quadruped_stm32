@@ -3,7 +3,7 @@
 
 void portAEN()
 {
-    RCC->APB2ENR = RCC_APB2ENR_IOPAEN; // IO PA Enable
+    RCC->APB2ENR |= RCC_APB2ENR_IOPAEN; // IO PA Enable
 }
 
 void portAAltEN()

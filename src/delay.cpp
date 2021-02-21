@@ -8,7 +8,7 @@ void delay(uint32_t msec)
     }
 }
 
-void delayMc(uint32_t mcsec)
+void delay_m(uint32_t mcsec)
 {
     for (uint32_t j = 0; j < 2UL * mcsec; j++)
     {
