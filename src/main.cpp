@@ -1,24 +1,27 @@
 #include "main.h"
 
-#include "motors/motor.h"
-#include "led.h"
-#include "delay.h"
-#include "usart.h"
-#include "tim6.h"
+int started = 0;
 
-// *** test timer ***
-
+int i = 0;
 int ledValue = 1;
 extern "C" void TIM6_IRQHandler(void)
 {
     if ((TIM6->SR & TIM_SR_UIF) == TIM_SR_UIF)
     {
         TIM6->SR &= ~TIM_SR_UIF;
-        ledValue = !ledValue;
-        ledRed(ledValue);
-        ledBlue(ledValue);
 
-        // uartWrite("LED BLINK", sizeof("LED BLINK"));
+        if (!started && i > 1000)
+        {
+            started = 1;
+            uartWrite("System started\r");
+        }
+        if (started && i > 500)
+        {
+            i = 0;
+            ledValue = !ledValue;
+            ledRed(ledValue);
+        }
+        i++;
     }
 }
 
@@ -26,33 +29,46 @@ extern "C" void TIM6_IRQHandler(void)
 
 void setup()
 {
-    init_motors();
-    init_tim6();
     init_led();
     init_usart(9600);
-    // setMotor1Value(50, 100);
+    init_tim6();
+    init_motors();
 }
+
+int state = 0;
 
 int main(void)
 {
     setup();
-
-    uartWrite("command1", sizeof("command1"));
+    ledRed(1);
 
     while (1)
     {
-        // step for all motors
-        // motorHandler();
-
-        char command[30];
-        uartRead(command);
-        if (uartRead(command))
+        delay(10);
+        if (started)
         {
-            uartWrite("command", sizeof("command"));
-            usartWriteChar(command[0]);
-        }
+            std::string str = uartRead();
+            if (!str.empty())
+            {
+                if (str == "m1test")
+                {
+                    uartWriteLn("Motor 1 test start");
+                    // setMotor1Value(50, 100);
+                }
+                else if (str == "m2test")
+                {
+                    uartWriteLn("Motor 2 test start");
+                }
+                else if (str == "m3test")
+                {
+                    uartWriteLn("Motor 3 test start");
+                }
 
-        // delayMc(100);
+                uartWrite("Command ");
+                uartWriteLn(str);
+                // ledBlue(1);
+            }
+        }
     }
 
     return 0;

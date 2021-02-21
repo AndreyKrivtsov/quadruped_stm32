@@ -13,7 +13,8 @@ void rollMotorPinsRegister()
     portAAltEN();
     portBEN();
 
-    pinsEN();
+    // error, usart1 disable
+    // pinsEN();
 
     tim1En();
 }

@@ -44,45 +44,47 @@ void init_motors()
     rollMotorPinsRegister();
 }
 
+int ledState = 0;
 extern "C" void TIM7_IRQHandler(void)
 {
+    if ((TIM7->SR & TIM_SR_UIF) == TIM_SR_UIF)
+    {
+        TIM7->SR &= ~TIM_SR_UIF;
+    }
+    ledBlue(ledState);
+    ledState = !ledState;
     // motorHandler();
 }
 void motorHandler(void)
 {
-    // if ((TIM7->SR & TIM_SR_UIF) == TIM_SR_UIF)
-    // {
-    //     TIM7->SR &= ~TIM_SR_UIF;
-
-    reset_1_counter++;
     if (reset_1_counter > motor_1_value)
     {
         motor1Step();
         reset_1_counter = 0;
     }
+    reset_1_counter++;
 
-    reset_2_counter++;
     if (reset_2_counter > motor_2_value)
     {
         motor2Step();
         reset_2_counter = 0;
     }
+    reset_2_counter++;
 
-    reset_3_counter++;
     if (reset_3_counter > motor_3_value)
     {
         motor3Step();
         reset_3_counter = 0;
     }
-    // }
+    reset_3_counter++;
 }
 
 void init_timer_motors()
 {
     RCC->APB1ENR |= RCC_APB1ENR_TIM7EN;
 
-    TIM7->PSC = 8000;
-    TIM7->ARR = 1000;
+    TIM7->PSC = 8000; // 1khz / 1ms
+    TIM7->ARR = 100; // 100ms
     TIM7->DIER |= TIM_DIER_UIE;
     TIM7->CR1 |= TIM_CR1_CEN;
 
