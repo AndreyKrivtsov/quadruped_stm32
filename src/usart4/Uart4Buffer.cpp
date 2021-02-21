@@ -1,20 +1,20 @@
-#include "UsartBuffer.h"
+#include "usart4/Usart4Buffer.h"
 
-    UsartBuffer::UsartBuffer()
+    Usart4Buffer::Usart4Buffer()
     {
         start = 0;
         end = 0;
         ready = 0;
     }
 
-    void UsartBuffer::push(uint8_t d)
+    void Usart4Buffer::push(uint8_t d)
     {
         if (end < USART_RX_BUFFER_LENGTH) {
             rx_buffer[end++] = d;
         }
     }
 
-    uint8_t UsartBuffer::pop()
+    uint8_t Usart4Buffer::pop()
     {
         if (!empty())
         {
@@ -25,28 +25,28 @@
         }
     }
 
-    int UsartBuffer::length()
+    int Usart4Buffer::length()
     {
         return end - start;
     }
 
-    int UsartBuffer::empty()
+    int Usart4Buffer::empty()
     {
         return start == end;
     }
 
-    void UsartBuffer::clear()
+    void Usart4Buffer::clear()
     {
         start = 0;
         end = 0;
     }
 
-    void UsartBuffer::setReady(int value)
+    void Usart4Buffer::setReady(int value)
     {
         ready = value;
     }
 
-    int UsartBuffer::isReady()
+    int Usart4Buffer::isReady()
     {
         return ready;
     }

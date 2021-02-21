@@ -16,6 +16,11 @@ void portBEN()
     RCC->APB2ENR |= RCC_APB2ENR_IOPBEN; // IO PB Enable
 }
 
+void portCEN()
+{
+    RCC->APB2ENR |= RCC_APB2ENR_IOPCEN; // IO PC Enable
+}
+
 void pinsEN() {
     pinPA8EN();
     pinPA9EN();
