@@ -8,7 +8,8 @@
 #include "motors/motor.h"
 #include "led.h"
 #include "delay.h"
-#include "usart.h"
+#include "usart1/usart1.h"
+#include "usart4/usart4.h"
 #include "tim6.h"
 
 // void TIM1_UP_IRQHandler(void);

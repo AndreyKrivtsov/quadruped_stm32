@@ -8,8 +8,8 @@
  
 \****************************************************************************/
 
-#include "usart.h"
-#include "UsartBuffer.h"
+#include "usart4/usart4.h"
+#include "usart4/Usart4Buffer.h"
 
 /*********************** defines                    *************************/
 
@@ -17,25 +17,25 @@
 #define USART_BAUD 9600
 #define BUFFER_SIZE 16
 
-int is_usart_init = 0;
-int timerCounter = 0;
+int is_uart4_init = 0;
+int timerCounter4 = 0;
 
-UsartBuffer buffer;
+Usart4Buffer buffer4;
 
-void printUsartState();
+void printUsart4State();
 
-void uartWrite(std::string str)
+void usart4Write(std::string str)
 {
     for (unsigned int i = 0; i < str.length(); i++)
     {
-        usartWriteChar((char)str[i]);
+        usart4WriteChar((char)str[i]);
     }
 }
 
-void uartWriteLn(std::string str)
+void usart4WriteLn(std::string str)
 {
-    uartWrite(str);
-    usartWriteChar('\r');
+    usart4Write(str);
+    usart4WriteChar('\r');
 }
 
 /*--------------------------------------------------------------------------*\
@@ -49,18 +49,18 @@ void uartWriteLn(std::string str)
  
 \*--------------------------------------------------------------------------*/
 
-std::string uartRead()
+std::string usart4Read()
 {
-    if (!buffer.empty() && buffer.isReady())
+    if (!buffer4.empty() && buffer4.isReady())
     {
         std::string str;
         
-        while (!buffer.empty())
+        while (!buffer4.empty())
         {
-            str += buffer.pop();
+            str += buffer4.pop();
         }
 
-        buffer.clear();
+        buffer4.clear();
         return str;
     }
     return "";
@@ -77,25 +77,25 @@ std::string uartRead()
  
 \*--------------------------------------------------------------------------*/
 
-void init_usart(uint32_t baudrate)
+void init_usart4(uint32_t baudrate)
 {
-    RCC->APB2ENR |= RCC_APB2ENR_USART1EN; // включаем тактирование UART1
-    RCC->APB2ENR |= RCC_APB2ENR_IOPAEN;   // разрешаем тактирование порта GPIOA
-    GPIOA->CRH &= (~GPIO_CRH_CNF9_0);
-    GPIOA->CRH |= (GPIO_CRH_CNF9_1 | GPIO_CRH_MODE9);
-    GPIOA->CRH &= (~GPIO_CRH_CNF10_0);
-    GPIOA->CRH |= GPIO_CRH_CNF10_1;
-    GPIOA->CRH &= (~(GPIO_CRH_MODE10));
-    GPIOA->BSRR |= GPIO_ODR_ODR10;
+    RCC->APB1ENR |= RCC_APB1ENR_UART4EN; // включаем тактирование UART1
+    RCC->APB2ENR |= RCC_APB2ENR_IOPCEN;   // разрешаем тактирование порта GPIOA
+    GPIOC->CRH &= (~GPIO_CRH_CNF10_0);
+    GPIOC->CRH |= (GPIO_CRH_CNF10_1 | GPIO_CRH_MODE10);
+    GPIOC->CRH &= (~GPIO_CRH_CNF11_0);
+    GPIOC->CRH |= GPIO_CRH_CNF11_1;
+    GPIOC->CRH &= (~(GPIO_CRH_MODE11));
+    GPIOC->BSRR |= GPIO_ODR_ODR11;
 
     uint32_t baud = (uint32_t)(8000000 / baudrate);
-    USART1->BRR = baud; // скорость 115200 бод
+    UART4->BRR = baud;
 
-    USART1->CR1 |= USART_CR1_UE | USART_CR1_TE | USART_CR1_RE | USART_CR1_RXNEIE;
-    USART1->CR2 = 0;
-    USART1->CR3 = 0;
+    UART4->CR1 |= USART_CR1_UE | USART_CR1_TE | USART_CR1_RE | USART_CR1_RXNEIE;
+    UART4->CR2 = 0;
+    UART4->CR3 = 0;
 
-    NVIC_EnableIRQ(USART1_IRQn);
+    NVIC_EnableIRQ(UART4_IRQn);
 }
 
 /*--------------------------------------------------------------------------*\
@@ -109,36 +109,36 @@ void init_usart(uint32_t baudrate)
  
 \*--------------------------------------------------------------------------*/
 
-extern "C" void USART1_IRQHandler(void)
+extern "C" void UART4_IRQHandler(void)
 {
-    if (USART1->SR & USART_SR_ORE)
+    if (UART4->SR & USART_SR_ORE)
     {
     }
-    if (USART1->SR & USART_SR_RXNE)
+    if (UART4->SR & USART_SR_RXNE)
     {
-        init_usart_timer();
-        uint8_t d = USART1->DR;
-        usartReceive(d);
+        init_usart4_timer();
+        uint8_t d = UART4->DR;
+        usart4Receive(d);
 
-        USART1->SR &= ~USART_SR_RXNE;
+        UART4->SR &= ~USART_SR_RXNE;
     }
-    if (USART1->SR & USART_SR_TC)
+    if (UART4->SR & USART_SR_TC)
     {
-        USART1->SR &= ~USART_SR_TC;
+        UART4->SR &= ~USART_SR_TC;
     }
 }
 
-void usartReceive(uint8_t d)
+void usart4Receive(uint8_t d)
 {
-    timerCounter = 0;
+    timerCounter4 = 0;
 
-    if (buffer.isReady())
+    if (buffer4.isReady())
     {
-        buffer.clear();
-        buffer.setReady(0);
+        buffer4.clear();
+        buffer4.setReady(0);
     }
 
-    buffer.push(d);
+    buffer4.push(d);
 }
 
 /*--------------------------------------------------------------------------*\
@@ -152,22 +152,22 @@ void usartReceive(uint8_t d)
  
 \*--------------------------------------------------------------------------*/
 
-void usartWriteChar(uint8_t byte)
+void usart4WriteChar(uint8_t byte)
 {
     if (byte == '\n')
     {
-        usartWriteChar('\r');
+        usart4WriteChar('\r');
     }
-    USART1->DR = (int)(byte);
-    while (!(USART1->SR & USART_SR_TXE))
+    UART4->DR = (int)(byte);
+    while (!(UART4->SR & USART_SR_TXE))
         ;
 }
 
-void init_usart_timer()
+void init_usart4_timer()
 {
-    if (!is_usart_init)
+    if (!is_uart4_init)
     {
-        is_usart_init = 1;
+        is_uart4_init = 1;
         RCC->APB1ENR |= RCC_APB1ENR_TIM5EN;
         TIM5->PSC = 8000;
         TIM5->ARR = 1;
@@ -181,38 +181,38 @@ extern "C" void TIM5_IRQHandler(void)
 {
     if ((TIM5->SR & TIM_SR_UIF) == TIM_SR_UIF)
     {
-        if (timerCounter < 20)
+        if (timerCounter4 < 20)
         {
-            timerCounter++;
+            timerCounter4++;
         }
         else
         {
-            timerCounter = 0;
+            timerCounter4 = 0;
 
-            if (!buffer.isReady())
+            if (!buffer4.isReady())
             {
-                buffer.setReady(1);
+                buffer4.setReady(1);
             }
         }
         TIM5->SR &= ~TIM_SR_UIF;
     }
 }
 
-void printUsartState()
+void printUsart4State()
 {
-    uartWrite("l ");
-    usartWriteChar(buffer.length() + 48);
-    uartWrite(" ");
+    usart4Write("l ");
+    usart4WriteChar(buffer4.length() + 48);
+    usart4Write(" ");
 
-    uartWrite("; val ");
-    int l = buffer.length();
+    usart4Write("; val ");
+    int l = buffer4.length();
 
     for (int i = 0; i < l; i++)
     {
-        const char asd = buffer.pop();
-        usartWriteChar(asd);
+        const char asd = buffer4.pop();
+        usart4WriteChar(asd);
     }
 
-    uartWrite("\r");
-    buffer.clear();
+    usart4Write("\r");
+    buffer4.clear();
 }

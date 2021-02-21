@@ -95,7 +95,7 @@ void init_usart(uint32_t baudrate)
     USART1->CR2 = 0;
     USART1->CR3 = 0;
 
-    NVIC_EnableIRQ(USART1_IRQn);
+    // NVIC_EnableIRQ(USART1_IRQn);
 }
 
 /*--------------------------------------------------------------------------*\
@@ -109,37 +109,37 @@ void init_usart(uint32_t baudrate)
  
 \*--------------------------------------------------------------------------*/
 
-extern "C" void USART1_IRQHandler(void)
-{
-    if (USART1->SR & USART_SR_ORE)
-    {
-    }
-    if (USART1->SR & USART_SR_RXNE)
-    {
-        init_usart_timer();
-        uint8_t d = USART1->DR;
-        usartReceive(d);
+// extern "C" void USART1_IRQHandler(void)
+// {
+//     if (USART1->SR & USART_SR_ORE)
+//     {
+//     }
+//     if (USART1->SR & USART_SR_RXNE)
+//     {
+//         init_usart_timer();
+//         uint8_t d = USART1->DR;
+//         usartReceive(d);
 
-        USART1->SR &= ~USART_SR_RXNE;
-    }
-    if (USART1->SR & USART_SR_TC)
-    {
-        USART1->SR &= ~USART_SR_TC;
-    }
-}
+//         USART1->SR &= ~USART_SR_RXNE;
+//     }
+//     if (USART1->SR & USART_SR_TC)
+//     {
+//         USART1->SR &= ~USART_SR_TC;
+//     }
+// }
 
-void usartReceive(uint8_t d)
-{
-    timerCounter = 0;
+// void usartReceive(uint8_t d)
+// {
+//     timerCounter = 0;
 
-    if (buffer.isReady())
-    {
-        buffer.clear();
-        buffer.setReady(0);
-    }
+//     if (buffer.isReady())
+//     {
+//         buffer.clear();
+//         buffer.setReady(0);
+//     }
 
-    buffer.push(d);
-}
+//     buffer.push(d);
+// }
 
 /*--------------------------------------------------------------------------*\
  
@@ -163,40 +163,40 @@ void usartWriteChar(uint8_t byte)
         ;
 }
 
-void init_usart_timer()
-{
-    if (!is_usart_init)
-    {
-        is_usart_init = 1;
-        RCC->APB1ENR |= RCC_APB1ENR_TIM5EN;
-        TIM5->PSC = 8000;
-        TIM5->ARR = 1;
-        TIM5->DIER |= TIM_DIER_UIE;
-        TIM5->CR1 |= TIM_CR1_CEN;
-        NVIC_EnableIRQ(TIM5_IRQn);
-    }
-}
+// void init_usart_timer()
+// {
+//     if (!is_usart_init)
+//     {
+//         is_usart_init = 1;
+//         RCC->APB1ENR |= RCC_APB1ENR_TIM5EN;
+//         TIM5->PSC = 8000;
+//         TIM5->ARR = 1;
+//         TIM5->DIER |= TIM_DIER_UIE;
+//         TIM5->CR1 |= TIM_CR1_CEN;
+//         NVIC_EnableIRQ(TIM5_IRQn);
+//     }
+// }
 
-extern "C" void TIM5_IRQHandler(void)
-{
-    if ((TIM5->SR & TIM_SR_UIF) == TIM_SR_UIF)
-    {
-        if (timerCounter < 20)
-        {
-            timerCounter++;
-        }
-        else
-        {
-            timerCounter = 0;
+// extern "C" void TIM5_IRQHandler(void)
+// {
+//     if ((TIM5->SR & TIM_SR_UIF) == TIM_SR_UIF)
+//     {
+//         if (timerCounter < 20)
+//         {
+//             timerCounter++;
+//         }
+//         else
+//         {
+//             timerCounter = 0;
 
-            if (!buffer.isReady())
-            {
-                buffer.setReady(1);
-            }
-        }
-        TIM5->SR &= ~TIM_SR_UIF;
-    }
-}
+//             if (!buffer.isReady())
+//             {
+//                 buffer.setReady(1);
+//             }
+//         }
+//         TIM5->SR &= ~TIM_SR_UIF;
+//     }
+// }
 
 void printUsartState()
 {
