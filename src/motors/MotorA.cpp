@@ -1,21 +1,11 @@
 #include "motors/MotorA.h"
 
-class MotorA {
-    void rollMotorA(uint8_t value)
-    {
-        rollMotorA(value);
-    }
-};
-
 void rollMotorPinsRegister()
 {
     portAEN();
     portAAltEN();
     portBEN();
-
-    // error, usart1 disable
     pinsEN();
-
     tim1En();
 }
 

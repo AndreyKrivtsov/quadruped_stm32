@@ -50,28 +50,31 @@ int main(void)
             std::string str = usart4Read();
             if (!str.empty())
             {
-                if (str[0] == 'm') {
+                // std::string length = std::to_string(str.size());
+                // usart4WriteLn(length);
+                if (str[0] == 'm')
+                {
                     usart4Write("Motor ");
 
-                    if (str[1] == '1') {
+                    char motor_number = str[1];
+                    std::string motor_value = str.substr(3);
+
+                    if (motor_number == '1')
+                    {
+
                         usart4Write("1 ");
-                        int speed = stoi(str.substr(2, 3));
-                        setMotor1Value(speed, 100);
-                        usart4WriteLn("speed " + str.substr(2, 3));
-                    }
 
-                    if (str[1] == '2') {
-                        usart4Write("2 ");
-                        int speed = stoi(str.substr(2, 3));
-                        setMotor1Value(speed, 100);
-                        usart4WriteLn("speed " + str.substr(2, 3));
-                    }
+                        if (str[2] == 's')
+                        {
+                            setMotor1Speed(stoi(motor_value), 100);
+                            usart4WriteLn("speed " + motor_value);
+                        }
 
-                    if (str[1] == '3') {
-                        usart4Write("3 ");
-                        int speed = stoi(str.substr(2, 3));
-                        setMotor1Value(speed, 100);
-                        usart4WriteLn("speed " + str.substr(2, 3));
+                        if (str[2] == 'a')
+                        {
+                            setMotor1Angle(stoi(motor_value), 100);
+                            usart4WriteLn("angle " + motor_value);
+                        }
                     }
                 }
 

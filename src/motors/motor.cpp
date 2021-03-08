@@ -28,26 +28,28 @@ void motor3Step();
 
 // ********************
 
+MotorA motorA;
+
+
 // exported functions *
 
-void setMotor1Value(float speed, int torque)
+void setMotor1Speed(float speed, int torque)
 {
-    int min = 0;
-    int max = 100;
-    int targetMax = 512;
-    int pwm = (torque - min) / (max - min) * targetMax;
-    int period = ((speed)-min) / (max - min) * targetMax;
-    // usart4WriteLn(std::to_string((int)period));
-    // motor_1_value = (int)period;
-    motor_1_value = speed;
+    motorA.speed(speed, torque);
 }
+
+void setMotor1Angle(float angle, int torque)
+{
+    motorA.angle(angle);
+}
+
 
 // *********************
 
 void init_motors()
 {
     init_timer_motors();
-    rollMotorPinsRegister();
+    motorA.init();
 }
 
 extern "C" void TIM7_IRQHandler(void)
@@ -61,12 +63,7 @@ extern "C" void TIM7_IRQHandler(void)
 
 void motorHandler(void)
 {
-    if (reset_1_counter > motor_1_value)
-    {
-        motor1Step();
-        reset_1_counter = 0;
-    }
-    reset_1_counter++;
+    motorA.loop();
 
     if (reset_2_counter > motor_2_value)
     {
@@ -95,38 +92,6 @@ void init_timer_motors()
     NVIC_EnableIRQ(TIM7_IRQn);
 }
 
-// *************** motor 1 step *********************
-
-uint16_t currentMotor1StepA = 0;
-uint16_t currentMotor1StepB = 40;
-uint16_t currentMotor1StepC = 80;
-
-void motor1Step()
-{
-    // usart4Write(std::to_string((int)currentMotor1StepA) + " | ");
-    // usart4Write(std::to_string((int)currentMotor1StepB) + " | ");
-    // usart4WriteLn(std::to_string((int)currentMotor1StepC));
-
-    if (currentMotor1StepA == 119)
-    {
-        currentMotor1StepA = 0;
-        ledBlue(ledState);
-        ledState = !ledState;
-    }
-
-    if (currentMotor1StepB == 119)
-        currentMotor1StepB = 0;
-    if (currentMotor1StepC == 119)
-        currentMotor1StepC = 0;
-
-    rollMotorAPWM(sinTable[currentMotor1StepA]);
-    rollMotorBPWM(sinTable[currentMotor1StepB]);
-    rollMotorCPWM(sinTable[currentMotor1StepC]);
-
-    currentMotor1StepA++;
-    currentMotor1StepB++;
-    currentMotor1StepC++;
-}
 
 // **************************************************
 
@@ -135,6 +100,7 @@ void motor1Step()
 void motor2Step()
 {
 }
+
 
 // **************************************************
 
