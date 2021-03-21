@@ -1,5 +1,5 @@
-#ifndef TIM_H
-#define TIM_H
+#ifndef TIM1_H
+#define TIM1_H
 
 void tim1En();
 

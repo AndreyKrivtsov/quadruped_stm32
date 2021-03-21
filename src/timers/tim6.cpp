@@ -1,4 +1,4 @@
-#include "tim6.h"
+#include "timers/tim6.h"
 
 void init_tim6()
 {

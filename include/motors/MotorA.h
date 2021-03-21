@@ -2,26 +2,14 @@
 #define MOTORA_H
 
 #include "stm32f1xx.h"
-#include "tim.h"
+#include "timers/tim1.h"
+#include "utils/sin.h"
 #include "gpio.h"
-
-#include "sin.h"
-
 #include "led.h"
-
-void rollMotorPinsRegister();
-
-void rollMotorA(uint8_t value);
-void rollMotorB(uint8_t value);
-void rollMotorC(uint8_t value);
 
 void rollMotorAPWM(uint16_t value);
 void rollMotorBPWM(uint16_t value);
 void rollMotorCPWM(uint16_t value);
-
-void rollMotorPinAP(uint16_t value);
-void rollMotorPinBP(uint16_t value);
-void rollMotorPinCP(uint16_t value);
 
 class MotorA
 {
@@ -38,11 +26,11 @@ public:
 
     void speed(int speed, int torque)
     {
-        int min = 0;
-        int max = 100;
-        int targetMax = 512;
-        int pwm = (torque - min) / (max - min) * targetMax;
-        int period = ((speed)-min) / (max - min) * targetMax;
+        // int min = 0;
+        // int max = 100;
+        // int targetMax = 512;
+        // int pwm = (torque - min) / (max - min) * targetMax;
+        // int period = ((speed)-min) / (max - min) * targetMax;
         value = speed;
     }
 
