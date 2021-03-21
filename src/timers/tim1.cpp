@@ -1,5 +1,5 @@
 #include "stm32f1xx.h"
-#include "tim.h"
+#include "timers/tim1.h"
 
 void tim1En(void)
 {
